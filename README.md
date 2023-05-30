@@ -1,0 +1,1 @@
+# HSR-Chat-v2
