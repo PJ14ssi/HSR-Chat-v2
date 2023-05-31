@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Honkai Star Rail Bot Chat</title>
+  <style>
+    /* CSS code... */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;600;700&family=Work+Sans&display=swap');
+    * {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  box-sizing: border-box;
+  font-size: 24px;
+  font-weight: 700;
+  background: #FFFFFF;
+  padding: 50px;
+}
+
+.chatbox {
+  height: 400px;
+  width: 600px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: scroll;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+}
+
+.chat-input input[type="text"] {
+  flex: 1;
+  height: 40px;
+  padding: 5px;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 200px;
+}
+
+.chat-input button {
+  height: 40px;
+  padding: 5px 10px;
+  background: #D5BA8A;
+  border: none;
+  border-radius: 5px;
+  color: #FFFFFF;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: visible;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+}
+
+.message-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  max-width: 100%;
+  animation: fade-in var(--anim-speed) var(--anim-ease);
+}
+
+.message-row[data-role="broadcaster"] {
+  --margin: calc(var(--profile-size) + var(--extra-padding));
+  --align: flex-start;
+  --background: #D5BA8A;
+  --corners: var(--corner) 0px var(--corner) 0px;
+}
+
+.message-row:before {
+  content: "";
+  position: relative;
+  flex: 0 0 var(--profile-size);
+  height: var(--profile-size);
+  width: var(--profile-size);
+  border-radius: 50%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-right: var(--extra-padding);
+}
+
+.message-row[data-role="broadcaster"]:before {
+  margin-right: var(--extra-padding);
+}
+
+.message-content {
+  display: flex;
+  background: var(--background);
+  color: #000000;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  white-space: pre-wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  max-width: auto, none; /* Add this line */
+ }
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.message-row:not([data-role="broadcaster"]) {
+  align-self: flex-end;
+}
+
+.message-row[data-role="broadcaster"] {
+  align-self: flex-start;
+}
+
+.message-row[data-username="User"] {
+  margin-right: 10px;
+  align-self: flex-end;
+}
+
+.message-row[data-username="Bot"] {
+  margin-left: 10px;
+  align-self: flex-start;
+}
+
+.message-row[data-username="User"] .message-content {
+  --background: #D5BA8A;
+  align-self: flex-start;
+}
+
+.message-row[data-username="Bot"] .message-content {
+  --background: #EBEBEB;
+  align-self: flex-end;
+}
+
+.username {
+  font-weight: bold;
+  color: blue;
+  margin-bottom: 5px;
+}
+
+.text {
+  margin-top: 5px;
+}
+
+.badge {
+  display: none;
+}
+
+.user-box {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  text-align: var(--align);
+}
+
+.username {
+  color: black;
+}
+
+.user-message {
+  word-wrap: break-word;
+  text-align: var(--align);
+}
+
+.user-box,
+.user-message {
+  animation: fade var(--anim-speed) var(--anim-ease);
+}
+
+.message {
+  background-color: var(--bgcol);
+  border-radius: var(--corners);
+  padding: 6px 18px;
+  display: inline-block;
+}
+
+.message-row[data-username="User"] {
+  align-self: flex-end;
+}
+
+.message-row[data-username="Bot"] {
+  align-self: flex-start;
+}
+
+[data-emotesonly="true"] .message {
+  background-color: transparent !important;
+  padding: 6px 18px;
+  display: inline-block;
+}
+
+[data-emotesonly="true"] .emote {
+  height: 90px;
+}
+
+.emote {
+  height: 24px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+}
+
+.action {
+  font-style: italic;
+}
+
+@keyframes bounce-in {
+  from {
+    transform: translateY(50px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0;
+  }
+}
+
+.emote {
+      display: inline-block;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+
+</style>
+</head>
+<body>
+    <div class="chatbox" id="chatbox"></div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message...">
+      <button id="sendButton">Send</button>
+    </div>
+    <script>
+
+    // Rest of the code...
+ // Function to add a message to the chatbox
+ function addMessage(username, message, isUser) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message-row');
+      messageElement.setAttribute('data-role', 'broadcaster');
+      messageElement.setAttribute('data-username', isUser ? 'User' : 'Bot');
+
+      const messageContent = document.createElement('div');
+      messageContent.classList.add('message-content');
+
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      usernameElement.textContent = username;
+
+      const textElement = document.createElement('span');
+      textElement.classList.add('text');
+      textElement.textContent = message;
+
+      messageContent.appendChild(usernameElement);
+      messageContent.appendChild(textElement);
+
+      messageElement.appendChild(messageContent);
+
+      // Prepend the message element to the chatbox
+      chatbox.insertBefore(messageElement, chatbox.firstChild);
+
+      // Remove excess messages if the limit is reached
+      const messages = chatbox.getElementsByClassName('message-row');
+      if (messages.length > messagesLimit) {
+        chatbox.removeChild(messages[messages.length - 1]);
+      }
+
+      // Scroll to the bottom of the chatbox
+      chatbox.scrollTop += messageElement.offsetHeight;
+    }
+
+    // Function to scroll to the bottom of the chatbox
+    function scrollToBottom() {
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    // Function to handle sending a message
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        const username = 'User'; // Set the username to the user's name or any desired value
+
+        // Split the message into individual lines
+        const lines = message.split('\n');
+
+        // Add each line of the message with a delay
+        lines.forEach((line, index) => {
+          setTimeout(() => {
+            addMessage(username, line, true);
+            scrollToBottom();
+
+            // If it's the last line of the message, simulate bot response
+            if (index === lines.length - 1) {
+              setTimeout(() => {
+                const botUsername = 'Bot';
+                const botMessage = 'You achieved copium. KEKW';
+                addMessage(botUsername, botMessage, false);
+                scrollToBottom();
+              }, 1000); // Wait for 1 second before showing the bot response
+            }
+          }, index * 500); // Delay each line by 500 milliseconds
+        });
+
+        messageInput.value = '';
+      }
+    }
+
+    const chatbox = document.getElementById('chatbox');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+
+    chatbox.addEventListener('scroll', function() {
+      const isScrolling = chatbox.scrollHeight - chatbox.scrollTop !== chatbox.clientHeight;
+      if (!isScrolling) {
+        const botUsername = 'Bot';
+        const botMessage = 'Message no longer squished. Achieved giga-copium.';
+        addMessage(botUsername, botMessage, false);
+        scrollToBottom();
+      }
+    });
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', function(event) {
+     if (event.key === 'Enter') {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+    
+function sendMessage() {
+  const message = messageInput.value.trim();
+  if (message !== '') {
+    const username = 'User'; // Set the username to the user's name or any desired value
+
+    // Split the message into individual lines
+    const lines = message.split('\n');
+
+    // Add each line of the message with a delay
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        addMessage(username, line, true);
+        scrollToBottom();
+
+        // If it's the last line of the message, simulate bot response
+        if (index === lines.length - 1) {
+          setTimeout(() => {
+            const botUsername = 'Bot';
+            const botMessage = 'You achieved copium. KEKW';
+            addMessage(botUsername, botMessage, false);
+            scrollToBottom();
+          }, 1000); // Wait for 1 second before showing the bot response
+        }
+      }, index * 500); // Delay each line by 500 milliseconds
+    });
+
+    messageInput.value = '';
+  }
+}
+    messagesLimit = 100;
+    let channelName = '';
+    let emulateNames = false;
+
+    window.addEventListener('onWidgetLoad', function(obj) {
+      const fieldData = obj.detail.fieldData;
+      channelName = obj.detail.channel.username;
+      emulateNames = fieldData.emulateNames;
+
+      const css = document.createElement('style');
+      css.type = 'text/css';
+      css.innerHTML = `
+        /* CSS code... */
+
+        /* Debug message styles */
+        .chatbox .message-row[data-username="Bot"] .message-content {
+          background: lightblue;
+          color: black;
+        }
+      `;
+
+      document.head.appendChild(css);
+
+      // Set the channel name as the username for the user's messages
+      if (channelName === '') {
+        channelName = 'User';
+      }
+    });
+
+    function runTests() {
+      if (test1()) {
+        console.log("Test 1 passed ✅"); // Checkmark emoji added
+      } else {
+        console.log("Test 1 failed ❌");
+      }
+
+      if (test2()) {
+        console.log("Test 2 passed ✅"); // Checkmark emoji added
+      } else {
+        console.log("Test 2 failed ❌");
+      }
+
+      if (test3()) {
+        console.log("Test 3 passed ✅"); // Checkmark emoji added
+      } else {
+        console.log("Test 3 failed ❌");
+      }
+
+      if (allTestsPassed()) {
+        console.log("Code bono~! ✅"); // Checkmark emoji added
+      } else {
+        console.log("Code has issues ❌");
+      }
+    }
+
+    function test1() {
+      return !!document.getElementById('chatbox');
+    }
+
+    function test2() {
+      return !!document.getElementById('messageInput');
+    }
+
+    function test3() {
+      return !!document.getElementById('sendButton');
+    }
+
+    function test4() {
+        return chatbox.scrollHeight > chatbox.clientHeight;
+    }
+
+    function allTestsPassed() {
+      return test1() && test2() && test3();
+    }
+
+    runTests(); // Execute the tests when the page loads
+  </script>
+</body>
+</html>
